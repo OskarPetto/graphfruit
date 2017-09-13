@@ -42,19 +42,11 @@ namespace graphfruit {
     friend std::ostream& operator<<(std::ostream& out, const graph<V1>& g);
 
     /*
-     * Adds a directed edge between source_vertex and target_vertex to
-     * the graph and adds the vertices if they don't exist to the graph.
-     * Complexity: O(1)
+     * Adds an undirected edge between the source vertex and the target vertex
+     * to the graph and adds the vertices if they don't exist in the graph.
+     * Complexity: O(1) amortized
      */
     void add_edge(std::size_t source_vertex, std::size_t target_vertex, double edge_weight = 1.0);
-
-    /*
-     * Returns true if and only if there exists a directed edge between
-     * source_vertex and target_vertex. Returns false if either vertex is not
-     * in this graph.
-     * Complexity: O(V)
-     */
-    bool contains_edge(std::size_t source_vertex, std::size_t target_vertex) const;
 
     /*
      * Returns the degree of the vertex. Returns 0 if the vertex does not exist.
@@ -70,8 +62,8 @@ namespace graphfruit {
     std::vector<std::size_t> neighbours(std::size_t u) const;
 
     /*
-     * Removes all edges between the source_vertex and the target_vertex from
-     * the graph. Does nothing if there are no directed edges.
+     * Removes all edges between the source vertex and the target vertex from
+     * the graph. Does nothing if there are no undirected edges.
      * Complexity: O(E * E)
      */
     void remove_edges(std::size_t source_vertex, std::size_t target_vertex);
@@ -141,28 +133,6 @@ namespace graphfruit {
     this->edge_list.push_back(e1);
     this->vertex_list[source_vertex]->outgoing_edge_list.push_back(e1);
     this->vertex_list[target_vertex]->outgoing_edge_list.push_back(e2);
-  }
-
-  template <class V>
-  bool graph<V>::contains_edge(std::size_t source_vertex, std::size_t target_vertex) const {
-    if (!this->contains_vertex(source_vertex) || !this->contains_vertex(target_vertex)) {
-      return false;
-    }
-    if (this->vertex_list[source_vertex]->outgoing_edge_list.size() <
-        this->vertex_list[target_vertex]->outgoing_edge_list.size()) {
-      for (edge* e : this->vertex_list[source_vertex]->outgoing_edge_list) {
-        if (e->target_vertex == this->vertex_list[target_vertex]) {
-          return true;
-        }
-      }
-    } else {
-      for (edge* e : this->vertex_list[target_vertex]->outgoing_edge_list) {
-        if (e->target_vertex == this->vertex_list[source_vertex]) {
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   template <class V>

@@ -33,6 +33,17 @@ int main(int argc, char const *argv[]) {
   d.add_edge(2, 3);
   d.add_edge(3, 1);
 
+  std::cout << " -------Graph------- " << '\n';
+
+  std::cout << g.degree(4) << '\n';
+  std::cout << g.edge_weight(0, 1) << '\n';
+
+  std::cout << " -------Digraph------- " << '\n';
+
+  std::cout << d.in_degree(4) << '\n';
+  std::cout << d.out_degree(4) << '\n';
+  std::cout << d.edge_weight(2, 3) << '\n';
+
   std::cout << " -------Breadth First Search------- " << '\n';
 
   std::vector<bool> visited = breadth_first_search(d, 2);
@@ -60,11 +71,9 @@ int main(int argc, char const *argv[]) {
   std::cout << " -------Minimum Spanning Tree------- " << '\n';
 
   std::vector<std::pair<std::size_t, std::size_t>> kmst = kruskal_minimum_spanning_tree(g);
-  std::vector<std::pair<std::size_t, std::size_t>> pmst = prim_minimum_spanning_tree(g);
 
-  for (std::size_t i = 0; i < kmst.size(); i++) {
-    std::cout << "(" << kmst[i].first << ", " << kmst[i].second << ")";
-    std::cout << " (" << pmst[i].first << ", " << pmst[i].second << ")" << '\n';
+  for (std::pair<std::size_t, std::size_t> i : kmst) {
+    std::cout << "(" << i.first << ", " << i.second << ")" << '\n';
   }
 
   std::cout << " -------Topological Sort------- " << '\n';

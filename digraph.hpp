@@ -40,30 +40,22 @@ namespace graphfruit {
     friend std::ostream& operator<<(std::ostream& out, const digraph<V1>& g);
 
     /*
-     * Adds a directed edge between source_vertex and target_vertex to
-     * the graph and adds the vertices if they don't exist to the graph.
-     * Complexity: O(1)
+     * Adds a directed edge between the source vertex and the target vertex to
+     * the graph and adds the vertices if they don't exist in the graph.
+     * Complexity: O(1) amortized
      */
     void add_edge(std::size_t source_vertex, std::size_t target_vertex, double edge_weight = 1.0);
 
     /*
-     * Returns true if and only if there exists a directed edge between
-     * source_vertex and target_vertex. Returns false if either vertex is not
-     * in this graph.
-     * Complexity: O(V)
-     */
-    bool contains_edge(std::size_t source_vertex, std::size_t target_vertex) const;
-
-    /*
-     * Returns the indegree of the vertex. Returns 0 if the vertex
-     * does not exist.
+     * Returns the indegree of the vertex. Returns 0 if the vertex doesn't
+     * exist.
      * Complexity: O(E)
      */
     std::size_t in_degree(std::size_t u) const;
 
     /*
-     * Returns the outdegree of the vertex. Returns 0 if the vertex
-     * does not exist.
+     * Returns the outdegree of the vertex. Returns 0 if the vertex doesn't
+     * exist.
      * Complexity: O(1)
      */
     std::size_t out_degree(std::size_t u) const;
@@ -76,7 +68,7 @@ namespace graphfruit {
     std::vector<std::size_t> predecessors(std::size_t u) const;
 
     /*
-     * Removes all edges between the source_vertex and the target_vertex from
+     * Removes all edges between the source vertex and the target vertex from
      * the graph. Does nothing if there are no directed edges.
      * Complexity: O(E * E)
      */
@@ -134,19 +126,6 @@ namespace graphfruit {
     edge* e = new edge(this->vertex_list[source_vertex], this->vertex_list[target_vertex], edge_weight);
     this->edge_list.push_back(e);
     this->vertex_list[source_vertex]->outgoing_edge_list.push_back(e); // seg fault
-  }
-
-  template <class V>
-  bool digraph<V>::contains_edge(std::size_t source_vertex, std::size_t target_vertex) const {
-    if (!this->contains_vertex(source_vertex) || !this->contains_vertex(target_vertex)) {
-      return false;
-    }
-    for (edge* e : this->vertex_list[source_vertex]->outgoing_edge_list) {
-      if (e->target_vertex == this->vertex_list[target_vertex]) {
-        return true;
-      }
-    }
-    return false;
   }
 
   template <class V>

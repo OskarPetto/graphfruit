@@ -43,8 +43,8 @@ namespace graphfruit {
     bool operator!=(const base_graph<V>& other) const;
 
     /*
-     * Adds an edge between source vertex and target_vertex to the graph and
-     * adds vertices to the graph if they don't exist.
+     * Adds an edge between the source vertex and the target_vertex to the
+     * graph and adds vertices if they don't exist in the graph.
      * Complexity: O(1) amortized
      */
     virtual void add_edge(std::size_t source_vertex, std::size_t target_vertex, double edge_weight = 1.0) = 0;
@@ -66,7 +66,7 @@ namespace graphfruit {
      * and target vertex. Returns false if either vertex is not in this graph.
      * Complexity: O(V)
      */
-    virtual bool contains_edge(std::size_t source_vertex, std::size_t target_vertex) const = 0;
+    bool contains_edge(std::size_t source_vertex, std::size_t target_vertex) const;
 
     /*
      * Returns true if and only if there exists a vertex with the given index.
@@ -88,8 +88,7 @@ namespace graphfruit {
     double edge_weight(std::size_t source_vertex, std::size_t target_vertex) const;
 
     /*
-     * Returns a vector of size_t pairs representing the source and target
-     * vertices of all edges.
+     * Returns a vector of vectex pairs representing all edges.
      * Complexity: O(E)
      */
     std::vector<std::pair<std::size_t, std::size_t>> edges() const;
@@ -286,6 +285,19 @@ namespace graphfruit {
     }
     edge_list.clear();
     vertex_list.clear();
+  }
+
+  template <class V>
+  bool base_graph<V>::contains_edge(std::size_t source_vertex, std::size_t target_vertex) const {
+   if (!this->contains_vertex(source_vertex) || !this->contains_vertex(target_vertex)) {
+     return false;
+   }
+   for (edge* e : this->vertex_list[source_vertex]->outgoing_edge_list) {
+     if (e->target_vertex == this->vertex_list[target_vertex]) {
+       return true;
+     }
+   }
+   return false;
   }
 
   template <class V>
