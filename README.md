@@ -1,6 +1,6 @@
 # graphfruit
-**graphfruit** is a small graph library written in C++. It was created to improve
-my knowledge in graph theory and to learn basic C++.
+**graphfruit** is a small graph library written in C++. It was created to  
+learn basic C++ and to improve my knowledge in graph theory.
 
 Output of *tester.cpp*:
 
