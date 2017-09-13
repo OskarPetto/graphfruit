@@ -1,8 +1,11 @@
 # graphfruit
-graphfruit is a small C++ graph library
+*graphfruit* is a small graph library written in C++. It was created to deepen
+my knowledge in graph theory and to learn basic C++.
+
+Output of *tester.cpp*:
 
 ```
- -------Graph------- 
+ -------Graph-------
 2
 4
  -------Digraph-------
