@@ -1,8 +1,12 @@
 # graphfruit
-**graphfruit** is a small graph library written in C++. It was created to learn basic C++ and to improve my knowledge in graph theory. By using templates **graphfruit** provides generic data structures and algorithms.
+**graphfruit** is a small graph library written in C++ that provides generic data structures and algorithms. It was created to learn basic C++ and to improve my knowledge in graph theory. Data structures:
 
+* Union-find
+* Fibonacci heap
+* Graph
+* Digraph
 
-Currently implemented algorithms:
+Algorithms:
 
 * Breadth-first search
 * Cycle detection
