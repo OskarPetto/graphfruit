@@ -1,7 +1,5 @@
 #include "graph.hpp"
 #include "digraph.hpp"
-#include <iostream>
-#include <type_traits>
 
 using namespace graphfruit;
 
@@ -85,6 +83,18 @@ int main(int argc, char const *argv[]) {
     std::cout << i << '\n';
   }
 
+  std::cout << " -------All shortest paths------- " << '\n';
+
+  std::vector<std::vector<std::size_t> > all_paths = johnson_all_shortest_paths(g);
+
+  for (std::size_t i = 0; i < all_paths.size(); i++) {
+    std::cout << i << ": ";
+    for (std::size_t j : all_paths[i]) {
+      std::cout << j << " ";
+    }
+    std::cout << '\n';
+  }
+
   std::cout << " -------Is cyclic------- " << '\n';
 
   bool cycle = is_cyclic(d1);
@@ -92,7 +102,7 @@ int main(int argc, char const *argv[]) {
 
   std::cout << " -------Minimum spanning tree------- " << '\n';
 
-  std::vector<std::pair<std::size_t, std::size_t>> kmst = kruskal_minimum_spanning_tree(g);
+  std::vector<std::pair<std::size_t, std::size_t> > kmst = kruskal_minimum_spanning_tree(g);
 
   for (std::pair<std::size_t, std::size_t> i : kmst) {
     std::cout << "(" << i.first << ", " << i.second << ")" << '\n';

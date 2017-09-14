@@ -14,6 +14,7 @@
 * Cycle detection
 * Dijkstra's shortest path
 * Bellman-Ford shortest path
+* Johnson's all shortest paths
 * Kruskal's minimum spanning tree
 * Prim's minimum spanning tree
 * Khan's topological sorting
@@ -46,6 +47,16 @@ Output of *tester.cpp*:
 4
 1
 0
+-------All shortest paths-------
+0: 0 0 1 2 5 6 7 0 2
+1: 0 1 1 2 5 2 7 1 2
+2: 0 2 2 2 5 2 5 6 2
+3: 0 2 3 3 3 2 5 6 2
+4: 0 2 5 4 4 4 5 6 2
+5: 0 2 5 2 5 5 5 6 2
+6: 0 7 5 2 5 6 6 6 6
+7: 0 7 5 2 5 6 7 7 7
+8: 0 2 8 2 5 2 8 8 8
 -------Is cyclic-------
 0
 -------Minimum spanning tree-------

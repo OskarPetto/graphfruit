@@ -1,7 +1,7 @@
 /*
  * A class for directed graphs.
  * @version 14.09.2017
- *  Bellman-Ford adlgorithm added
+ *  Johnson's algorithm added 
  * @version 13.09.2017
  *  first version
  */
@@ -49,11 +49,23 @@ namespace graphfruit {
     void add_edge(std::size_t source_vertex, std::size_t target_vertex, double edge_weight = 1.0);
 
     /*
+     * Returns a vector of vectex pairs representing all edges.
+     * Complexity: O(E)
+     */
+    std::vector<std::pair<std::size_t, std::size_t> > edges() const;
+
+    /*
      * Returns the indegree of the vertex. Returns 0 if the vertex doesn't
      * exist.
      * Complexity: O(E)
      */
     std::size_t in_degree(std::size_t u) const;
+
+    /*
+     * Returns the number of directed edges in the graph.
+     * Complexity: O(1)
+     */
+    std::size_t number_of_edges() const {return this->edge_list.size();}
 
     /*
      * Returns the outdegree of the vertex. Returns 0 if the vertex doesn't
@@ -72,7 +84,7 @@ namespace graphfruit {
     /*
      * Removes all edges between the source vertex and the target vertex from
      * the graph. Does nothing if there are no directed edges.
-     * Complexity: O(E * E)
+     * Complexity: O(E^2)
      */
     void remove_edges(std::size_t source_vertex, std::size_t target_vertex);
 
@@ -84,25 +96,14 @@ namespace graphfruit {
     std::vector<std::size_t> successors(std::size_t u) const;
 
     /*
-     * Uses the Bellman-Ford algorithm to calculate the shortest paths between
-     * the start vertex and all other vertices. Returns a vector of
-     * predecessors in these shortest paths. Returns an empty vector if the
-     * start vertex is not in the graph or the graph contains a negative cycle.
-     * Complexity: O(VE)
+     * Uses Johnsons's algorithm to calculate the shortest paths between the
+     * all pairs of vertices. Returns a 2D vector of vertices in the path in
+     * reversed order. Returns an empty 2D vector if the graph contains a
+     * negative cycle.
+     * Complexity: O(E + V * log(V))
      */
     template <class V1>
-    friend std::vector<std::size_t> bellman_ford_shortest_path(const digraph<V1>& g, std::size_t start_vertex);
-
-    /*
-     * Uses the Bellman-Ford algorithm to calculate the shortest paths between
-     * the start vertex and the end vertex. Returns a vector of vertices in the
-     * path in reversed order. Returns an empty vector if the start vertex or
-     * the end vertex are not in the graph or the graph contains a negative
-     * cycle.
-     * Complexity: O(VE)
-     */
-    template <class V1>
-    friend std::vector<std::size_t> bellman_ford_shortest_path(const digraph<V1>& g, std::size_t start_vertex, std::size_t end_vertex);
+    friend std::vector<std::vector<std::size_t> > johnson_all_shortest_paths(const digraph<V1>& g);
 
     /*
      * Uses Khan's algorithm to get a topological sorting of the graph. Returns
@@ -126,7 +127,7 @@ namespace graphfruit {
   std::ostream& operator<<(std::ostream& out, const digraph<V>& g) {
     out << "Digraph: V=" << g.number_of_vertices();
     out << ", E=" << g.number_of_edges();
-    for (typename base_graph<V>::edge* e : g.edge_list) {
+    for (typename digraph<V>::edge* e : g.edge_list) {
       out << std::endl;
       out << " ";
       out << "(" << e.source_vertex->vertex_index;
@@ -149,6 +150,19 @@ namespace graphfruit {
     edge* e = new edge(this->vertex_list[source_vertex], this->vertex_list[target_vertex], edge_weight);
     this->edge_list.push_back(e);
     this->vertex_list[source_vertex]->outgoing_edge_list.push_back(e); // seg fault
+  }
+
+
+  template <class V>
+  std::vector<std::pair<std::size_t, std::size_t> > digraph<V>::edges() const {
+    std::vector<std::pair<std::size_t, std::size_t> > v(number_of_edges());
+    for (std::size_t i = 0; i < number_of_edges(); i++) {
+      std::pair<std::size_t, std::size_t> a;
+      a.first = this->edge_list[i]->source_vertex->vertex_index;
+      a.second = this->edge_list[i]->target_vertex->vertex_index;
+      v[i] = a;
+    }
+    return v;
   }
 
   template <class V>
@@ -225,50 +239,29 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<std::size_t> bellman_ford_shortest_path(const digraph<V>& g, std::size_t start_vertex) {
-    if (!g.contains_vertex(start_vertex)) {
-      std::vector<std::size_t> empty;
+  std::vector<std::vector<std::size_t> > johnson_all_shortest_paths(const digraph<V>& g) {
+    digraph<V> g1(g);
+    std::size_t u = g1.number_of_vertices();
+    g1.add_vertex();
+    for (std::size_t v = 0; v < u; v++) {
+      g1.add_edge(u, v, 0.0);
+    }
+    std::vector<double> bf_distance = g1.bellman_ford_distance(u);
+    if (bf_distance.empty()) {
+      std::vector<std::vector<std::size_t> > empty;
       return empty;
     }
-    std::vector<std::size_t> previous(g.number_of_vertices());
-    std::vector<double> distance(g.number_of_vertices(), std::numeric_limits<double>::max());
-    distance[start_vertex] = 0.0;
-
-    for (std::size_t i = 0; i < g.number_of_vertices() - 1; i++) {
-      for (typename base_graph<V>::edge* e : g.edge_list) {
-        std::size_t u = e->source_vertex->vertex_index;
-        std::size_t v = e->target_vertex->vertex_index;
-        if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
-          distance[v] = distance[u] + e->edge_weight;
-          previous[v] = u;
-        }
-      }
-    }
-    for (typename base_graph<V>::edge* e : g.edge_list) {
+    g1 = g;
+    for (typename base_graph<V>::edge* e : g1.edge_list) {
       std::size_t u = e->source_vertex->vertex_index;
       std::size_t v = e->target_vertex->vertex_index;
-      if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
-        std::vector<std::size_t> empty;
-        return empty;
-      }
+      e->edge_weight += bf_distance[u] - bf_distance[v];
+    }
+    std::vector<std::vector<std::size_t> > previous(g1.number_of_vertices(), std::vector<std::size_t>(g1.number_of_vertices()));
+    for (std::size_t i = 0; i < g1.number_of_vertices(); i++) {
+      previous[i] = dijkstra_shortest_path(g1, i);
     }
     return previous;
-  }
-
-  template <class V>
-  std::vector<std::size_t> bellman_ford_shortest_path(const digraph<V>& g, std::size_t start_vertex, std::size_t end_vertex) {
-    std::vector<std::size_t> path;
-    if (!g.contains_vertex(start_vertex) || !g.contains_vertex(end_vertex)) {
-      return path;
-    }
-    std::vector<std::size_t> previous = bellman_ford_shortest_path(g, start_vertex);
-    std::size_t i = end_vertex;
-    while (i != start_vertex) {
-      path.push_back(i);
-      i = previous[i];
-    }
-    path.push_back(start_vertex);
-    return path;
   }
 
   template <class V>
