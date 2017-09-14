@@ -31,7 +31,7 @@ namespace graphfruit {
     /*
      * Constructors
      */
-    explicit base_graph(std::size_t n = 0);
+    explicit base_graph(size_t n = 0);
     base_graph(const base_graph<V>& other);
     base_graph(base_graph<V>&& other) noexcept;
     base_graph& operator=(const base_graph<V>& other);
@@ -49,7 +49,7 @@ namespace graphfruit {
      * graph and adds vertices if they don't exist in the graph.
      * Complexity: O(1) amortized
      */
-    virtual void add_edge(std::size_t source_vertex, std::size_t target_vertex, double edge_weight = 1.0) = 0;
+    virtual void add_edge(size_t source_vertex, size_t target_vertex, double edge_weight = 1.0) = 0;
 
     /*
      * Creates a new vertex and adds it to the graph.
@@ -68,13 +68,13 @@ namespace graphfruit {
      * and target vertex. Returns false if either vertex is not in this graph.
      * Complexity: O(V)
      */
-    bool contains_edge(std::size_t source_vertex, std::size_t target_vertex) const;
+    bool contains_edge(size_t source_vertex, size_t target_vertex) const;
 
     /*
      * Returns true if and only if there exists a vertex with the given index.
      * Complexity: O(1)
      */
-    bool contains_vertex(std::size_t u) const;
+    bool contains_vertex(size_t u) const;
 
     /*
      * Copies all vertices and edges from the other graph.
@@ -87,13 +87,13 @@ namespace graphfruit {
      * the either vertex or the edge doesn't exist.
      * Complexity: O(V)
      */
-    double edge_weight(std::size_t source_vertex, std::size_t target_vertex) const;
+    double edge_weight(size_t source_vertex, size_t target_vertex) const;
 
     /*
      * Returns a vector of vectex pairs representing all edges.
      * Complexity: O(E)
      */
-    virtual std::vector<std::pair<std::size_t, std::size_t> > edges() const = 0;
+    virtual std::vector<std::pair<size_t, size_t> > edges() const = 0;
 
     /*
      * Returns true if and only if there are no vertices in the graph.
@@ -105,20 +105,20 @@ namespace graphfruit {
      * Returns the number of edges in the graph.
      * Complexity: O(1)
      */
-    virtual std::size_t number_of_edges() const = 0;
+    virtual size_t number_of_edges() const = 0;
 
     /*
      * Returns the number of vertices in the graph.
      * Complexity: O(1)
      */
-    std::size_t number_of_vertices() const {return vertex_list.size();}
+    size_t number_of_vertices() const {return vertex_list.size();}
 
     /*
      * Removes all edges between the source vertex and the target vertex from
      * the graph. Does nothing if there are no edges.
      * Complexity: O(E^2)
      */
-    virtual void remove_edges(std::size_t source_vertex, std::size_t target_vertex) = 0;
+    virtual void remove_edges(size_t source_vertex, size_t target_vertex) = 0;
 
     /*
      * Removes a vertex from the graph. Removing a vertex also removes all
@@ -126,27 +126,28 @@ namespace graphfruit {
      * vertex does not exist.
      * Complexity: O(V^2 + E^2)
      */
-    void remove_vertex(std::size_t u);
+    void remove_vertex(size_t u);
 
     /*
      * Returns the data stored in the vertex. Throws an illegal argument
      * exception if the vertex doesn't exist.
      * Complexity: O(1)
      */
-    V vertex_data(std::size_t u) const;
+    V vertex_data(size_t u) const;
 
     /*
      * Uses the Bellman-Ford algorithm to calculate the shortest paths between
      * the start vertex and all other vertices. Returns a vector of
-     * predecessors in these shortest paths. Returns an empty vector if the
-     * start vertex is not in the graph or the graph contains a negative cycle.
+     * predecessors in these shortest paths. If there exists no path -1 is the
+     * predecessor. Returns an empty vector if the start vertex is not in the
+     * graph or the graph contains a negative cycle.
      * Complexity: O(VE)
      */
     template <class V1>
-    friend std::vector<std::size_t> bellman_ford_shortest_path(const base_graph<V1>& g, std::size_t start_vertex);
+    friend std::vector<ssize_t> bellman_ford_shortest_path(const base_graph<V1>& g, size_t start_vertex);
 
     /*
-     * Uses the Bellman-Ford algorithm to calculate the shortest paths between
+     * Uses the Bellman-Ford algorithm to calculate the shortest path between
      * the start vertex and the end vertex. Returns a vector of vertices in the
      * path in reversed order. Returns an empty vector if the start vertex or
      * the end vertex are not in the graph or the graph contains a negative
@@ -154,7 +155,7 @@ namespace graphfruit {
      * Complexity: O(VE)
      */
     template <class V1>
-    friend std::vector<std::size_t> bellman_ford_shortest_path(const base_graph<V1>& g, std::size_t start_vertex, std::size_t end_vertex);
+    friend std::vector<size_t> bellman_ford_shortest_path(const base_graph<V1>& g, size_t start_vertex, size_t end_vertex);
 
     /*
      * Performs a BFS on the graph starting from start vertex. Returns a bool
@@ -162,21 +163,21 @@ namespace graphfruit {
      * Complexity: O(V + E)
      */
     template <class V1>
-    friend std::vector<bool> breadth_first_search(const base_graph<V1>& g, std::size_t start_vertex);
+    friend std::vector<bool> breadth_first_search(const base_graph<V1>& g, size_t start_vertex);
 
     /*
      * Uses Dijkstra's algorithm to calculate the shortest paths between the
      * start vertex and all other vertices. Returns a vector of predecessors in
-     * these shortest paths. Returns an empty vector if the start vertex is not
-     * in the graph. The result is undefined if the graph contains edges with
-     * negative weight.
+     * these shortest paths. If there exists no path -1 is the predecessor.
+     * Returns an empty vector if the start vertex is not in the graph. The
+     * result is undefined if the graph contains edges with negative weight.
      * Complexity: O(E + V * log(V))
      */
     template <class V1>
-    friend std::vector<std::size_t> dijkstra_shortest_path(const base_graph<V1>& g, std::size_t start_vertex);
+    friend std::vector<ssize_t> dijkstra_shortest_path(const base_graph<V1>& g, size_t start_vertex);
 
     /*
-     * Uses Dijkstra's algorithm to calculate the shortest paths between the
+     * Uses Dijkstra's algorithm to calculate the shortest path between the
      * start vertex and the end vertex. Returns a vector of vertices in the
      * path in reversed order. Returns an empty vector if the start vertex or
      * the end vertex are not in the graph. The result is undefined if the
@@ -184,7 +185,7 @@ namespace graphfruit {
      * Complexity: O(E + V * log(V))
      */
     template <class V1>
-    friend std::vector<std::size_t> dijkstra_shortest_path(const base_graph<V1>& g, std::size_t start_vertex, std::size_t end_vertex);
+    friend std::vector<size_t> dijkstra_shortest_path(const base_graph<V1>& g, size_t start_vertex, size_t end_vertex);
 
     /*
      * Uses a modified DFS to detect cycles in a graph. Returns true if and
@@ -213,11 +214,11 @@ namespace graphfruit {
 
     struct vertex {
 
-      std::size_t vertex_index; // index of vertex in graph
+      size_t vertex_index; // index of vertex in graph
       V vertex_data; // store data in this vertex
       std::vector<edge*> outgoing_edge_list; // edges leaving this vertex
 
-      explicit vertex(std::size_t vertex_index, V vertex_data = V())
+      explicit vertex(size_t vertex_index, V vertex_data = V())
         : vertex_index(vertex_index)
         , vertex_data(vertex_data) {}
 
@@ -228,14 +229,14 @@ namespace graphfruit {
 
     // for fibonacci_heap in dijkstra_shortest_path
     struct fib_comp {
-      bool operator() (const std::pair<std::size_t, double>& a, const std::pair<std::size_t, double>& b) {
+      bool operator() (const std::pair<size_t, double>& a, const std::pair<size_t, double>& b) {
         return a.second < b.second;
       }
     };
 
-    std::vector<double> bellman_ford_distance(std::size_t start_vertex) const;
+    std::vector<double> bellman_ford_distance(size_t start_vertex) const;
 
-    bool is_cyclic_util(std::vector<int>& color, std::size_t u) const;
+    bool is_cyclic_util(std::vector<int>& color, size_t u) const;
 
   };
 
@@ -243,9 +244,9 @@ namespace graphfruit {
    * graph member implementations
    */
   template <class V>
-  base_graph<V>::base_graph(std::size_t n) {
+  base_graph<V>::base_graph(size_t n) {
     vertex_list.resize(n);
-    for (std::size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++) {
       vertex_list[i] = new vertex(i);
     }
   }
@@ -316,7 +317,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  bool base_graph<V>::contains_edge(std::size_t source_vertex, std::size_t target_vertex) const {
+  bool base_graph<V>::contains_edge(size_t source_vertex, size_t target_vertex) const {
    if (!this->contains_vertex(source_vertex) || !this->contains_vertex(target_vertex)) {
      return false;
    }
@@ -329,23 +330,23 @@ namespace graphfruit {
   }
 
   template <class V>
-  bool base_graph<V>::contains_vertex(std::size_t u) const {
+  bool base_graph<V>::contains_vertex(size_t u) const {
     return u < vertex_list.size();
   }
 
   template <class V>
   void base_graph<V>::deep_copy(const base_graph<V>& other) {
-    std::size_t num_vertices = this->vertex_list.size();
-    std::size_t num_edges = this->edge_list.size();
+    size_t num_vertices = this->vertex_list.size();
+    size_t num_edges = this->edge_list.size();
     vertex_list.resize(num_vertices + other.number_of_vertices());
     edge_list.resize(num_edges + other.edge_list.size());
-    for (std::size_t i = 0; i < other.number_of_vertices(); i++) {
+    for (size_t i = 0; i < other.number_of_vertices(); i++) {
       vertex* u = new vertex(num_vertices + i, other.vertex_list[i]->vertex_data);
       vertex_list[num_vertices + i] = u;
     }
-    for (std::size_t i = 0; i < other.edge_list.size(); i++) {
-      std::size_t u = other.edge_list[i]->source_vertex->vertex_index + num_vertices;
-      std::size_t v = other.edge_list[i]->target_vertex->vertex_index + num_vertices;
+    for (size_t i = 0; i < other.edge_list.size(); i++) {
+      size_t u = other.edge_list[i]->source_vertex->vertex_index + num_vertices;
+      size_t v = other.edge_list[i]->target_vertex->vertex_index + num_vertices;
       edge* e = new edge(vertex_list[u], vertex_list[v], other.edge_list[i]->edge_weight);
       edge_list[num_edges + i] = e;
       vertex_list[u]->outgoing_edge_list.push_back(e);
@@ -353,7 +354,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  double base_graph<V>::edge_weight(std::size_t source_vertex, std::size_t target_vertex) const {
+  double base_graph<V>::edge_weight(size_t source_vertex, size_t target_vertex) const {
     if (!contains_vertex(source_vertex) || !contains_vertex(target_vertex)) {
       throw std::invalid_argument("edge_weight::vertex does not exist");
     }
@@ -366,7 +367,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  void base_graph<V>::remove_vertex(std::size_t u) {
+  void base_graph<V>::remove_vertex(size_t u) {
     if(!contains_vertex(u)) {
       return;
     }
@@ -405,7 +406,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  V base_graph<V>::vertex_data(std::size_t u) const {
+  V base_graph<V>::vertex_data(size_t u) const {
     if (!contains_vertex(u)) {
       throw std::invalid_argument("vertex_data::vertex does not exist");
     }
@@ -413,19 +414,19 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<std::size_t> bellman_ford_shortest_path(const base_graph<V>& g, std::size_t start_vertex) {
+  std::vector<ssize_t> bellman_ford_shortest_path(const base_graph<V>& g, size_t start_vertex) {
     if (!g.contains_vertex(start_vertex)) {
-      std::vector<std::size_t> empty;
+      std::vector<ssize_t> empty;
       return empty;
     }
-    std::vector<std::size_t> previous(g.number_of_vertices());
+    std::vector<ssize_t> previous(g.number_of_vertices(), -1);
     std::vector<double> distance(g.number_of_vertices(), std::numeric_limits<double>::max());
     distance[start_vertex] = 0.0;
 
-    for (std::size_t i = 0; i < g.number_of_vertices() - 1; i++) {
+    for (size_t i = 0; i < g.number_of_vertices() - 1; i++) {
       for (typename base_graph<V>::edge* e : g.edge_list) {
-        std::size_t u = e->source_vertex->vertex_index;
-        std::size_t v = e->target_vertex->vertex_index;
+        size_t u = e->source_vertex->vertex_index;
+        size_t v = e->target_vertex->vertex_index;
         if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
           distance[v] = distance[u] + e->edge_weight;
           previous[v] = u;
@@ -433,10 +434,10 @@ namespace graphfruit {
       }
     }
     for (typename base_graph<V>::edge* e : g.edge_list) {
-      std::size_t u = e->source_vertex->vertex_index;
-      std::size_t v = e->target_vertex->vertex_index;
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
       if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
-        std::vector<std::size_t> empty;
+        std::vector<ssize_t> empty;
         return empty;
       }
     }
@@ -444,13 +445,19 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<std::size_t> bellman_ford_shortest_path(const base_graph<V>& g, std::size_t start_vertex, std::size_t end_vertex) {
-    std::vector<std::size_t> path;
+  std::vector<size_t> bellman_ford_shortest_path(const base_graph<V>& g, size_t start_vertex, size_t end_vertex) {
+    std::vector<size_t> path;
     if (!g.contains_vertex(start_vertex) || !g.contains_vertex(end_vertex)) {
       return path;
     }
-    std::vector<std::size_t> previous = bellman_ford_shortest_path(g, start_vertex);
-    std::size_t i = end_vertex;
+    if (start_vertex == end_vertex) {
+      return path;
+    }
+    std::vector<ssize_t> previous = bellman_ford_shortest_path(g, start_vertex);
+    if (previous[end_vertex] == -1) {
+      return path;
+    }
+    size_t i = end_vertex;
     while (i != start_vertex) {
       path.push_back(i);
       i = previous[i];
@@ -460,22 +467,22 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<double> base_graph<V>::bellman_ford_distance(std::size_t start_vertex) const {
+  std::vector<double> base_graph<V>::bellman_ford_distance(size_t start_vertex) const {
     std::vector<double> distance(number_of_vertices(), std::numeric_limits<double>::max());
     distance[start_vertex] = 0.0;
 
-    for (std::size_t i = 0; i < number_of_vertices() - 1; i++) {
+    for (size_t i = 0; i < number_of_vertices() - 1; i++) {
       for (edge* e : edge_list) {
-        std::size_t u = e->source_vertex->vertex_index;
-        std::size_t v = e->target_vertex->vertex_index;
+        size_t u = e->source_vertex->vertex_index;
+        size_t v = e->target_vertex->vertex_index;
         if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
           distance[v] = distance[u] + e->edge_weight;
         }
       }
     }
     for (edge* e : edge_list) {
-      std::size_t u = e->source_vertex->vertex_index;
-      std::size_t v = e->target_vertex->vertex_index;
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
       if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
         std::vector<double> empty;
         return empty;
@@ -485,19 +492,19 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<bool> breadth_first_search(const base_graph<V>& g, std::size_t start_vertex) {
+  std::vector<bool> breadth_first_search(const base_graph<V>& g, size_t start_vertex) {
     std::vector<bool> processed(g.number_of_vertices());
     if (!g.contains_vertex(start_vertex)) {
       return processed;
     }
     processed[start_vertex] = true;
-    std::queue<std::size_t> q;
+    std::queue<size_t> q;
     q.push(start_vertex);
     while (!q.empty()) {
-      std::size_t u = q.front();
+      size_t u = q.front();
       q.pop();
       for (typename base_graph<V>::edge* e : g.vertex_list[u]->outgoing_edge_list) {
-        std::size_t v = e->target_vertex->vertex_index;
+        size_t v = e->target_vertex->vertex_index;
         if (!processed[v]) {
           processed[v] = true;
           q.push(v);
@@ -508,30 +515,29 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<std::size_t> dijkstra_shortest_path(const base_graph<V>& g, std::size_t start_vertex) {
+  std::vector<ssize_t> dijkstra_shortest_path(const base_graph<V>& g, size_t start_vertex) {
     if (!g.contains_vertex(start_vertex)) {
-      std::vector<std::size_t> empty;
+      std::vector<ssize_t> empty;
       return empty;
     }
-    std::vector<std::size_t> previous(g.number_of_vertices());
+    std::vector<ssize_t> previous(g.number_of_vertices(), -1);
     std::vector<double> distance(g.number_of_vertices(), std::numeric_limits<double>::max());
-    std::vector<fibonacci_node<std::pair<std::size_t, double> >*> fib_nodes(g.number_of_vertices());
-    fibonacci_heap<std::pair<std::size_t, double>, typename base_graph<V>::fib_comp> min_heap;
+    std::vector<fibonacci_node<std::pair<size_t, double> >*> fib_nodes(g.number_of_vertices());
+    fibonacci_heap<std::pair<size_t, double>, typename base_graph<V>::fib_comp> min_heap;
 
-    for (std::size_t i = 0; i < g.number_of_vertices(); i++) {
-      std::pair<std::size_t, double> a(i, std::numeric_limits<double>::max());
+    for (size_t i = 0; i < g.number_of_vertices(); i++) {
+      std::pair<size_t, double> a(i, std::numeric_limits<double>::max());
       fib_nodes[i] = min_heap.push(a);
     }
     distance[start_vertex] = 0.0;
     min_heap.decrease_key(fib_nodes[start_vertex], std::make_pair(start_vertex, 0.0));
-    previous[start_vertex] = start_vertex;
 
     while (!min_heap.empty()) {
-      std::pair<std::size_t, double> u = min_heap.top();
+      std::pair<size_t, double> u = min_heap.top();
       fib_nodes[u.first] = nullptr;
       min_heap.pop();
       for (typename base_graph<V>::edge* e : g.vertex_list[u.first]->outgoing_edge_list) {
-        std::size_t v = e->target_vertex->vertex_index;
+        size_t v = e->target_vertex->vertex_index;
         if (fib_nodes[v] && distance[u.first] != std::numeric_limits<double>::max() &&
             distance[v] > distance[u.first] + e->edge_weight) {
           distance[v] = distance[u.first] + e->edge_weight;
@@ -544,13 +550,19 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<std::size_t> dijkstra_shortest_path(const base_graph<V>& g, std::size_t start_vertex, std::size_t end_vertex) {
-    std::vector<std::size_t> path;
+  std::vector<size_t> dijkstra_shortest_path(const base_graph<V>& g, size_t start_vertex, size_t end_vertex) {
+    std::vector<size_t> path;
     if (!g.contains_vertex(start_vertex) || !g.contains_vertex(end_vertex)) {
       return path;
     }
-    std::vector<std::size_t> previous = dijkstra_shortest_path(g, start_vertex);
-    std::size_t i = end_vertex;
+    if (start_vertex == end_vertex) {
+      return path;
+    }
+    std::vector<ssize_t> previous = dijkstra_shortest_path(g, start_vertex);
+    if (previous[end_vertex] == -1) {
+      return path;
+    }
+    size_t i = end_vertex;
     while (i != start_vertex) {
       path.push_back(i);
       i = previous[i];
@@ -576,10 +588,10 @@ namespace graphfruit {
   }
 
   template <class V>
-  bool base_graph<V>::is_cyclic_util(std::vector<int>& color, std::size_t u) const {
+  bool base_graph<V>::is_cyclic_util(std::vector<int>& color, size_t u) const {
     color[u] = 1;
     for (edge* e : vertex_list[u]->outgoing_edge_list) {
-      std::size_t v = e->target_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
       if (color[v] == 1) {
         return true;
       }

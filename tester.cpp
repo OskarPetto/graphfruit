@@ -24,12 +24,16 @@ int main(int argc, char const *argv[]) {
 
   digraph<> d1(6);
 
-  d1.add_edge(5, 2);
-  d1.add_edge(5, 0);
-  d1.add_edge(4, 0);
-  d1.add_edge(4, 1);
-  d1.add_edge(2, 3);
-  d1.add_edge(3, 1);
+  d1.add_edge(0, 1, 5);
+  d1.add_edge(0, 2, 3);
+  d1.add_edge(1, 2, 2);
+  d1.add_edge(1, 3, 6);
+  d1.add_edge(2, 3, 7);
+  d1.add_edge(2, 4, 4);
+  d1.add_edge(2, 5, 2);
+  d1.add_edge(3, 4, -1);
+  d1.add_edge(3, 5, 1);
+  d1.add_edge(4, 5, -2);
 
   digraph<> d2(5);
 
@@ -63,12 +67,12 @@ int main(int argc, char const *argv[]) {
 
   std::cout << " -------Shortest path------- " << '\n';
 
-  std::size_t start = 0;
-  std::size_t end = 4;
+  size_t start = 0;
+  size_t end = 4;
 
-  std::vector<std::size_t> path = dijkstra_shortest_path(g, start, end);
+  std::vector<size_t> path = dijkstra_shortest_path(g, start, end);
 
-  for (std::size_t i : path) {
+  for (size_t i : path) {
     std::cout << i << '\n';
   }
 
@@ -79,17 +83,17 @@ int main(int argc, char const *argv[]) {
 
   path = bellman_ford_shortest_path(d2, start, end);
 
-  for (std::size_t i : path) {
+  for (size_t i : path) {
     std::cout << i << '\n';
   }
 
   std::cout << " -------All shortest paths------- " << '\n';
 
-  std::vector<std::vector<std::size_t> > all_paths = johnson_all_shortest_paths(g);
+  std::vector<std::vector<ssize_t> > all_paths = johnson_all_shortest_paths(g);
 
-  for (std::size_t i = 0; i < all_paths.size(); i++) {
+  for (ssize_t i = 0; i < all_paths.size(); i++) {
     std::cout << i << ": ";
-    for (std::size_t j : all_paths[i]) {
+    for (ssize_t j : all_paths[i]) {
       std::cout << j << " ";
     }
     std::cout << '\n';
@@ -102,17 +106,25 @@ int main(int argc, char const *argv[]) {
 
   std::cout << " -------Minimum spanning tree------- " << '\n';
 
-  std::vector<std::pair<std::size_t, std::size_t> > kmst = kruskal_minimum_spanning_tree(g);
+  std::vector<std::pair<size_t, size_t> > kmst = kruskal_minimum_spanning_tree(g);
 
-  for (std::pair<std::size_t, std::size_t> i : kmst) {
+  for (std::pair<size_t, size_t> i : kmst) {
     std::cout << "(" << i.first << ", " << i.second << ")" << '\n';
   }
 
   std::cout << " -------Topological sorting------- " << '\n';
 
-  std::vector<std::size_t> sorting = khan_topological_sort(d1);
+  std::vector<size_t> sorting = khan_topological_sort(d1);
 
-  for (std::size_t i : sorting) {
+  for (size_t i : sorting) {
+    std::cout << i << '\n';
+  }
+
+  std::cout << " -------Shortest path in DAG------- " << '\n';
+
+  path = shortest_path_in_DAG(d1, 1, 5);
+
+  for (size_t i : path) {
     std::cout << i << '\n';
   }
 

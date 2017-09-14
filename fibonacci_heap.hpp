@@ -1,6 +1,8 @@
 /*
  * A fibonacci heap implementation
  * @author Oskar Petto
+ * @version 14.09.2017
+ *  bug fixes
  * @version 13.09.2017
  *  first version
  */
@@ -293,9 +295,9 @@ namespace graphfruit {
       if (parent) {
         parent->marked = true;
       }
-      if (comp(node->key, min->key)) {
-        min = node;
-      }
+    }
+    if (comp(node->key, min->key)) {
+      min = node;
     }
   }
 
