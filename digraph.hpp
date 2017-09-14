@@ -115,25 +115,25 @@ namespace graphfruit {
     friend std::vector<size_t> khan_topological_sort(const digraph<V1>& g);
 
     /*
-     * Calculates the shortest paths between the start vertex to all other
+     * Calculates the longest paths between the start vertex to all other
      * vertices in a directed acyclic graph (DAG). Returns a vector of
-     * predecessors in these shortest paths. If there exists no path -1 is the
+     * predecessors in these longest paths. If there exists no path -1 is the
      * predecessor. Returns an empty vector if the start vertex is not in the
      * graph or the graph is no DAG.
      * Complexity: O(V + E)
      */
     template <class V1>
-    friend std::vector<ssize_t> shortest_path_in_DAG(const digraph<V1>& g, size_t start_vertex);
+    friend std::vector<ssize_t> DAG_longest_path(const digraph<V1>& g, size_t start_vertex);
 
     /*
-     * Calculates the shortest path between the start vertex to all other
+     * Calculates the longest path between the start vertex to all other
      * vertices in a directed acyclic graph (DAG). Returns a vector of vertices
      * in the path in reversed order. Returns an empty vector if the start
      * vertex is not in the graph or the graph is no DAG.
      * Complexity: O(V + E)
      */
     template <class V1>
-    friend std::vector<size_t> shortest_path_in_DAG(const digraph<V1>& g, size_t start_vertex, size_t end_vertex);
+    friend std::vector<size_t> DAG_longest_path(const digraph<V1>& g, size_t start_vertex, size_t end_vertex);
 
   };
 
@@ -320,7 +320,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<ssize_t> shortest_path_in_DAG(const digraph<V>& g, size_t start_vertex) {
+  std::vector<ssize_t> DAG_longest_path(const digraph<V>& g, size_t start_vertex) {
     if (!g.contains_vertex(start_vertex)) {
       std::vector<ssize_t> empty;
       return empty;
@@ -331,15 +331,17 @@ namespace graphfruit {
       return empty;
     }
     std::vector<ssize_t> previous(g.number_of_vertices(), -1);
-    std::vector<double> distance(g.number_of_vertices(), std::numeric_limits<double>::max());
+    std::vector<double> distance(g.number_of_vertices(), std::numeric_limits<double>::min());
     distance[start_vertex] = 0.0;
 
     for (size_t u : top_sort) {
-      for (typename digraph<V>::edge* e : g.vertex_list[u]->outgoing_edge_list) {
-        size_t v = e->target_vertex->vertex_index;
-        if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
-          distance[v] = distance[u] + e->edge_weight;
-          previous[v] = u;
+      if (distance[u] != std::numeric_limits<double>::min()) {
+        for (typename digraph<V>::edge* e : g.vertex_list[u]->outgoing_edge_list) {
+          size_t v = e->target_vertex->vertex_index;
+          if (distance[u] + e->edge_weight > distance[v]) {
+            distance[v] = distance[u] + e->edge_weight;
+            previous[v] = u;
+          }
         }
       }
     }
@@ -347,7 +349,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<size_t> shortest_path_in_DAG(const digraph<V>& g, size_t start_vertex, size_t end_vertex) {
+  std::vector<size_t> DAG_longest_path(const digraph<V>& g, size_t start_vertex, size_t end_vertex) {
     std::vector<size_t> path;
     if (!g.contains_vertex(start_vertex) || !g.contains_vertex(end_vertex)) {
       return path;
@@ -355,7 +357,7 @@ namespace graphfruit {
     if (start_vertex == end_vertex) {
       return path;
     }
-    std::vector<ssize_t> previous = shortest_path_in_DAG(g, start_vertex);
+    std::vector<ssize_t> previous = DAG_longest_path(g, start_vertex);
     if (previous.empty() || previous[end_vertex] == -1) {
       return path;
     }

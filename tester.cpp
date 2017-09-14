@@ -120,9 +120,9 @@ int main(int argc, char const *argv[]) {
     std::cout << i << '\n';
   }
 
-  std::cout << " -------Shortest path in DAG------- " << '\n';
+  std::cout << " -------Longest path in DAG------- " << '\n';
 
-  path = shortest_path_in_DAG(d1, 1, 5);
+  path = DAG_longest_path(d1, 1, 5);
 
   for (size_t i : path) {
     std::cout << i << '\n';

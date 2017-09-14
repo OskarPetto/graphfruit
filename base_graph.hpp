@@ -536,13 +536,14 @@ namespace graphfruit {
       std::pair<size_t, double> u = min_heap.top();
       fib_nodes[u.first] = nullptr;
       min_heap.pop();
-      for (typename base_graph<V>::edge* e : g.vertex_list[u.first]->outgoing_edge_list) {
-        size_t v = e->target_vertex->vertex_index;
-        if (fib_nodes[v] && distance[u.first] != std::numeric_limits<double>::max() &&
-            distance[v] > distance[u.first] + e->edge_weight) {
-          distance[v] = distance[u.first] + e->edge_weight;
-          min_heap.decrease_key(fib_nodes[v], std::make_pair(v, distance[v]));
-          previous[v] = u.first;
+      if (distance[u.first] != std::numeric_limits<double>::max()) {
+        for (typename base_graph<V>::edge* e : g.vertex_list[u.first]->outgoing_edge_list) {
+          size_t v = e->target_vertex->vertex_index;
+          if (fib_nodes[v] && distance[v] > distance[u.first] + e->edge_weight) {
+            distance[v] = distance[u.first] + e->edge_weight;
+            min_heap.decrease_key(fib_nodes[v], std::make_pair(v, distance[v]));
+            previous[v] = u.first;
+          }
         }
       }
     }

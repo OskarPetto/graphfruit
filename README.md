@@ -15,7 +15,7 @@
 * Dijkstra's shortest path
 * Bellman-Ford shortest path
 * Johnson's all shortest paths
-* Shortest path in DAGs
+* Longest path in DAGs
 * Kruskal's minimum spanning tree
 * Prim's minimum spanning tree
 * Khan's topological sorting
@@ -76,9 +76,9 @@ Output of *tester.cpp*:
 3
 4
 5
--------Shortest path in DAG-------
+-------Longest path in DAG-------
 5
-4
 3
+2
 1
 ```
