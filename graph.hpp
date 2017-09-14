@@ -1,5 +1,7 @@
 /*
  * A class for undirected graphs.
+ * @version 14.09.2017
+ *  Bellman-Ford adlgorithm added
  * @version 13.09.2017
  *  first version
  */
@@ -67,6 +69,27 @@ namespace graphfruit {
      * Complexity: O(E * E)
      */
     void remove_edges(std::size_t source_vertex, std::size_t target_vertex);
+
+    /*
+     * Uses the Bellman-Ford algorithm to calculate the shortest paths between
+     * the start vertex and all other vertices. Returns a vector of
+     * predecessors in these shortest paths. Returns an empty vector if the
+     * start vertex is not in the graph or the graph contains a negative cycle.
+     * Complexity: O(VE)
+     */
+    template <class V1>
+    friend std::vector<std::size_t> bellman_ford_shortest_path(const graph<V1>& g, std::size_t start_vertex);
+
+    /*
+     * Uses the Bellman-Ford algorithm to calculate the shortest paths between
+     * the start vertex and the end vertex. Returns a vector of vertices in the
+     * path in reversed order. Returns an empty vector if the start vertex or
+     * the end vertex are not in the graph or the graph contains a negative
+     * cycle.
+     * Complexity: O(VE)
+     */
+    template <class V1>
+    friend std::vector<std::size_t> bellman_ford_shortest_path(const graph<V1>& g, std::size_t start_vertex, std::size_t end_vertex);
 
     /*
      * Uses Kruskal's algorithm to find the edges of a minimum spanning tree of
@@ -191,6 +214,58 @@ namespace graphfruit {
   }
 
   template <class V>
+  std::vector<std::size_t> bellman_ford_shortest_path(const graph<V>& g, std::size_t start_vertex) {
+    if (!g.contains_vertex(start_vertex)) {
+      std::vector<std::size_t> empty;
+      return empty;
+    }
+    std::vector<std::size_t> previous(g.number_of_vertices());
+    std::vector<double> distance(g.number_of_vertices(), std::numeric_limits<double>::max());
+    distance[start_vertex] = 0.0;
+
+    for (std::size_t i = 0; i < g.number_of_vertices() - 1; i++) {
+      for (typename base_graph<V>::edge* e : g.edge_list) {
+        std::size_t u = e->source_vertex->vertex_index;
+        std::size_t v = e->target_vertex->vertex_index;
+        if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]) {
+          distance[v] = distance[u] + e->edge_weight;
+          previous[v] = u;
+        }
+        if (distance[v] != std::numeric_limits<double>::max() && distance[v] + e->edge_weight < distance[u]) {
+          distance[u] = distance[v] + e->edge_weight;
+          previous[u] = v;
+        }
+      }
+    }
+    for (typename base_graph<V>::edge* e : g.edge_list) {
+      std::size_t u = e->source_vertex->vertex_index;
+      std::size_t v = e->target_vertex->vertex_index;
+      if (distance[u] != std::numeric_limits<double>::max() && distance[u] + e->edge_weight < distance[v]
+          || distance[v] != std::numeric_limits<double>::max() && distance[v] + e->edge_weight < distance[u]) {
+        std::vector<std::size_t> empty;
+        return empty;
+      }
+    }
+    return previous;
+  }
+
+  template <class V>
+  std::vector<std::size_t> bellman_ford_shortest_path(const graph<V>& g, std::size_t start_vertex, std::size_t end_vertex) {
+    std::vector<std::size_t> path;
+    if (!g.contains_vertex(start_vertex) || !g.contains_vertex(end_vertex)) {
+      return path;
+    }
+    std::vector<std::size_t> previous = bellman_ford_shortest_path(g, start_vertex);
+    std::size_t i = end_vertex;
+    while (i != start_vertex) {
+      path.push_back(i);
+      i = previous[i];
+    }
+    path.push_back(start_vertex);
+    return path;
+  }
+
+  template <class V>
   std::vector<std::pair<std::size_t, std::size_t>> kruskal_minimum_spanning_tree(graph<V>& g) {
 
     std::vector<std::pair<std::size_t, std::size_t>> result(g.number_of_vertices() - 1);
@@ -217,12 +292,11 @@ namespace graphfruit {
   std::vector<std::pair<std::size_t, std::size_t>> prim_minimum_spanning_tree(graph<V>& g) {
 
     std::vector<std::pair<std::size_t, std::size_t>> result(g.number_of_vertices() - 1);
-    std::vector<double> distance(g.number_of_vertices());
+    std::vector<double> distance(g.number_of_vertices(), std::numeric_limits<double>::max());
     std::vector<fibonacci_node<std::pair<std::size_t, double>>*> fib_nodes(g.number_of_vertices());
     fibonacci_heap<std::pair<std::size_t, double>, typename base_graph<V>::fib_comp> min_heap;
 
     for (std::size_t i = 0; i < g.number_of_vertices(); i++) {
-      distance[i] = std::numeric_limits<double>::max();
       std::pair<std::size_t, double> a(i, std::numeric_limits<double>::max());
       fib_nodes[i] = min_heap.push(a);
     }

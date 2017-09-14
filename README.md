@@ -13,6 +13,7 @@
 * Breadth-first search
 * Cycle detection
 * Dijkstra's shortest path
+* Bellman-Ford shortest path
 * Kruskal's minimum spanning tree
 * Prim's minimum spanning tree
 * Khan's topological sorting
@@ -39,6 +40,11 @@ Output of *tester.cpp*:
 5
 6
 7
+0
+-------Shortest path (negative)-------
+3
+4
+1
 0
 -------Is cyclic-------
 0
