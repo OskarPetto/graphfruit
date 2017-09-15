@@ -15,7 +15,7 @@
 * Cycle detection
 * Dijkstra's shortest path
 * Johnson's all shortest paths
-* k-core decomposition
+* K-core decomposition
 * Khan's topological sorting
 * Kruskal's minimum spanning tree
 * Longest path in DAGs
@@ -83,7 +83,7 @@ Output of *tester.cpp*:
 3
 2
 1
--------k-cores-------
+-------K-core-------
 Graph: V=5, E=9
 [0] - 3 - 2 - 1
 [1] - 0 - 2 - 3 - 4
