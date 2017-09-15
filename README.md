@@ -10,15 +10,16 @@
 
 ### Algorithms:
 
+* Bellman-Ford shortest path
 * Breadth-first search
 * Cycle detection
 * Dijkstra's shortest path
-* Bellman-Ford shortest path
 * Johnson's all shortest paths
-* Longest path in DAGs
-* Kruskal's minimum spanning tree
-* Prim's minimum spanning tree
+* k-core decomposition
 * Khan's topological sorting
+* Kruskal's minimum spanning tree
+* Longest path in DAGs
+* Prim's minimum spanning tree
 
 Output of *tester.cpp*:
 
@@ -58,8 +59,9 @@ Output of *tester.cpp*:
 6: 7 7 5 2 5 6 -1 6 6
 7: 7 7 5 2 5 6 7 -1 7
 8: 1 2 8 2 5 2 8 8 -1
--------Is cyclic-------
+-------Is cyclic and is DAG-------
 0
+1
 -------Minimum spanning tree-------
 (6, 7)
 (8, 2)
@@ -81,4 +83,11 @@ Output of *tester.cpp*:
 3
 2
 1
+-------k-cores-------
+Graph: V=5, E=9
+[0] - 3 - 2 - 1
+[1] - 0 - 2 - 3 - 4
+[2] - 0 - 3 - 1 - 4
+[3] - 0 - 2 - 1 - 4
+[4] - 1 - 2 - 3
 ```

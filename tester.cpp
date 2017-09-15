@@ -5,22 +5,42 @@ using namespace graphfruit;
 
 int main(int argc, char const *argv[]) {
 
-  graph<> g;
+  graph<> g1;
 
-  g.add_edge(0, 1, 4.0);
-  g.add_edge(1, 2, 8.0);
-  g.add_edge(2, 3, 7.0);
-  g.add_edge(3, 4, 9.0);
-  g.add_edge(4, 5, 10.0);
-  g.add_edge(5, 6, 2.0);
-  g.add_edge(6, 7, 1.0);
-  g.add_edge(7, 0, 8.0);
-  g.add_edge(7, 1, 11.0);
-  g.add_edge(7, 8, 7.0);
-  g.add_edge(8, 2, 2.0);
-  g.add_edge(8, 6, 6.0);
-  g.add_edge(2, 5, 4.0);
-  g.add_edge(3, 5, 14.0);
+  g1.add_edge(0, 1, 4.0);
+  g1.add_edge(1, 2, 8.0);
+  g1.add_edge(2, 3, 7.0);
+  g1.add_edge(3, 4, 9.0);
+  g1.add_edge(4, 5, 10.0);
+  g1.add_edge(5, 6, 2.0);
+  g1.add_edge(6, 7, 1.0);
+  g1.add_edge(7, 0, 8.0);
+  g1.add_edge(7, 1, 11.0);
+  g1.add_edge(7, 8, 7.0);
+  g1.add_edge(8, 2, 2.0);
+  g1.add_edge(8, 6, 6.0);
+  g1.add_edge(2, 5, 4.0);
+  g1.add_edge(3, 5, 14.0);
+
+  graph<> g2(9);
+
+  g2.add_edge(0, 1);
+  g2.add_edge(0, 2);
+  g2.add_edge(1, 2);
+  g2.add_edge(1, 5);
+  g2.add_edge(2, 5);
+  g2.add_edge(5, 8);
+  g2.add_edge(5, 6);
+  g2.add_edge(6, 8);
+  g2.add_edge(2, 6);
+  g2.add_edge(2, 4);
+  g2.add_edge(2, 3);
+  g2.add_edge(4, 6);
+  g2.add_edge(3, 4);
+  g2.add_edge(3, 6);
+  g2.add_edge(3, 7);
+  g2.add_edge(4, 7);
+  g2.add_edge(6, 7);
 
   digraph<> d1(6);
 
@@ -48,8 +68,8 @@ int main(int argc, char const *argv[]) {
 
   std::cout << " -------Graph------- " << '\n';
 
-  std::cout << g.degree(4) << '\n';
-  std::cout << g.edge_weight(0, 1) << '\n';
+  std::cout << g1.degree(4) << '\n';
+  std::cout << g1.edge_weight(0, 1) << '\n';
 
   std::cout << " -------Digraph------- " << '\n';
 
@@ -70,7 +90,7 @@ int main(int argc, char const *argv[]) {
   size_t start = 0;
   size_t end = 4;
 
-  std::vector<size_t> path = dijkstra_shortest_path(g, start, end);
+  std::vector<size_t> path = dijkstra_shortest_path(g1, start, end);
 
   for (size_t i : path) {
     std::cout << i << '\n';
@@ -89,7 +109,7 @@ int main(int argc, char const *argv[]) {
 
   std::cout << " -------All shortest paths------- " << '\n';
 
-  std::vector<std::vector<ssize_t> > all_paths = johnson_all_shortest_paths(g);
+  std::vector<std::vector<ssize_t> > all_paths = johnson_all_shortest_paths(g1);
 
   for (ssize_t i = 0; i < all_paths.size(); i++) {
     std::cout << i << ": ";
@@ -99,14 +119,16 @@ int main(int argc, char const *argv[]) {
     std::cout << '\n';
   }
 
-  std::cout << " -------Is cyclic------- " << '\n';
+  std::cout << " -------Is cyclic and is DAG------- " << '\n';
 
   bool cycle = is_cyclic(d1);
+  bool DAG = is_DAG(d1);
   std::cout << cycle << '\n';
+  std::cout << DAG << '\n';
 
   std::cout << " -------Minimum spanning tree------- " << '\n';
 
-  std::vector<std::pair<size_t, size_t> > kmst = kruskal_minimum_spanning_tree(g);
+  std::vector<std::pair<size_t, size_t> > kmst = kruskal_minimum_spanning_tree(g1);
 
   for (std::pair<size_t, size_t> i : kmst) {
     std::cout << "(" << i.first << ", " << i.second << ")" << '\n';
@@ -127,6 +149,12 @@ int main(int argc, char const *argv[]) {
   for (size_t i : path) {
     std::cout << i << '\n';
   }
+
+  std::cout << " -------k-cores------- " << '\n';
+
+  graph<> kc = k_core(g2, 3);
+
+  std::cout << kc << '\n';
 
   return 0;
 }

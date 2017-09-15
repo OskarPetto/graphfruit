@@ -1,5 +1,7 @@
 /*
  * A class for undirected graphs.
+ * @version 15.09.2017
+    added k-core and changed formating of operator <<
  * @version 14.09.2017
  *  Johnson's algorithm added
  * @version 13.09.2017
@@ -93,6 +95,14 @@ namespace graphfruit {
     friend std::vector<std::vector<ssize_t> > johnson_all_shortest_paths(const graph<V1>& g);
 
     /*
+     * Returns the k-core of the graph. A k-core is a maximal subgraph in which
+     * all vertices have a degree of k or more.
+     * Complexity: O(V + E)
+     */
+    template <class V1>
+    friend graph<V1> k_core(const graph<V1>& g, size_t k);
+
+    /*
      * Uses Kruskal's algorithm to find the edges of a minimum spanning tree of
      * the graph. Returns the edges a vector of vertex pairs. If the graph is
      * not connnected the result is not defined.
@@ -119,6 +129,8 @@ namespace graphfruit {
       }
     };
 
+    bool DFS_degree(std::vector<bool>& visited, std::size_t u, std::vector<std::size_t>& degree, std::size_t k) const;
+
   };
 
   /*
@@ -132,12 +144,22 @@ namespace graphfruit {
   std::ostream& operator<<(std::ostream& out, const graph<V>& g) {
     out << "Graph: V=" << g.number_of_vertices();
     out << ", E=" << g.number_of_edges();
-    for (size_t i = 0; i < g.number_of_edges(); i++) {
+    // for (size_t i = 0; i < g.number_of_edges(); i++) {
+    //   out << std::endl;
+    //   out << " ";
+    //   out << "(" << g.edge_list[2 * i]->source_vertex->vertex_index;
+    //   out << ", " << g.edge_list[2 * i]->target_vertex->vertex_index;
+    //   out << ", " << g.edge_list[2 * i]->edge_weight;
+    //   out << ")";
+    // }
+    for (size_t i = 0; i < g.number_of_vertices(); i++) {
       out << std::endl;
       out << " ";
-      out << "{" << g.edge_list[2 * i]->source_vertex->vertex_index;
-      out << ", " << g.edge_list[2 * i]->target_vertex->vertex_index;
-      out << "} " << g.edge_list[2 * i]->edge_weight;
+      out << "[" << g.vertex_list[i]->vertex_index;
+      out << "]";
+      for (typename graph<V>::edge* e : g.vertex_list[i]->outgoing_edge_list) {
+        out << " - " << e->target_vertex->vertex_index;
+      }
     }
     return out;
   }
@@ -252,6 +274,65 @@ namespace graphfruit {
       previous[i] = dijkstra_shortest_path(g1, i);
     }
     return previous;
+  }
+
+  template <class V>
+  graph<V> k_core(const graph<V>& g, size_t k) {
+    std::vector<bool> visited(g.number_of_vertices());
+    std::vector<size_t> degree(g.number_of_vertices());
+
+    size_t min_degree = -1;
+    size_t start_vertex;
+
+    for (size_t i = 0; i < g.number_of_vertices(); i++) {
+      degree[i] = g.vertex_list[i]->outgoing_edge_list.size();
+      if (degree[i] < min_degree) {
+        min_degree = degree[i];
+        start_vertex = i;
+      }
+    }
+    g.DFS_degree(visited, start_vertex, degree, k);
+    for (size_t i = 0; i < g.number_of_vertices(); i++) {
+      if (!visited[i]) {
+        g.DFS_degree(visited, i, degree, k);
+      }
+    }
+    std::vector<ssize_t> pos(g.number_of_vertices(), -1);
+    size_t i = 0;
+    graph<V> g1;
+    for (size_t u = 0; u < g.number_of_vertices(); u++) {
+      if (degree[u] >= k) {
+        g1.add_vertex(g.vertex_list[u]->vertex_data);
+        pos[u] = i;
+        i++;
+      }
+    }
+    for (typename graph<V>::edge* e : g.edge_list) {
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
+      if (degree[u] >= k && degree[v] >= k && u > v) {
+        g1.add_edge(pos[u], pos[v], e->edge_weight);
+      }
+    }
+    return g1;
+  }
+
+  template <class V>
+  bool graph<V>::DFS_degree(std::vector<bool>& visited, size_t u, std::vector<size_t>& degree, size_t k) const {
+    visited[u] = true;
+
+    for (edge* e : this->vertex_list[u]->outgoing_edge_list) {
+      size_t v = e->target_vertex->vertex_index;
+      if (degree[u] < k) {
+        degree[v]--;
+      }
+      if (!visited[v]) {
+        if (DFS_degree(visited, v, degree, k)) {
+          degree[u]--;
+        }
+      }
+    }
+    return degree[u] < k;
   }
 
   template <class V>
