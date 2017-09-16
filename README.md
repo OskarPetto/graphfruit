@@ -20,6 +20,7 @@
 * Kruskal's minimum spanning tree
 * Longest path in DAGs
 * Prim's minimum spanning tree
+* Transpose of directed graph
 
 Output of *tester.cpp*:
 
@@ -83,11 +84,19 @@ Output of *tester.cpp*:
 3
 2
 1
--------K-core-------
+-------k-cores-------
 Graph: V=5, E=9
 [0] - 3 - 2 - 1
 [1] - 0 - 2 - 3 - 4
 [2] - 0 - 3 - 1 - 4
 [3] - 0 - 2 - 1 - 4
 [4] - 1 - 2 - 3
+-------Transpose of directed graph-------
+Digraph: V=6, E=10
+[0]
+[1] - 0
+[2] - 0 - 1
+[3] - 1 - 2
+[4] - 2 - 3
+[5] - 2 - 3 - 4
 ```

@@ -1,7 +1,7 @@
 /*
  * A class for undirected graphs.
  * @version 15.09.2017
-    added k-core and changed formating of operator <<
+ *  added k-core and changed formating of operator <<
  * @version 14.09.2017
  *  Johnson's algorithm added
  * @version 13.09.2017

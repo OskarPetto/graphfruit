@@ -156,5 +156,9 @@ int main(int argc, char const *argv[]) {
 
   std::cout << kc << '\n';
 
+  std::cout << " -------Transpose of directed graph------- " << '\n';
+
+  std::cout << transpose(d1) << '\n';
+
   return 0;
 }

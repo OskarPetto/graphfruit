@@ -1,5 +1,7 @@
 /*
  * An abstract class for undirected and directed graphs.
+ * @version 16.09.2017
+ *  added is_reachable
  * @version 14.09.2017
  *  Bellman-Ford algorithm added
  * @version 13.09.2017
@@ -194,6 +196,14 @@ namespace graphfruit {
      */
     template <class V1>
     friend bool is_cyclic(const base_graph<V1>& g);
+
+    /*
+     * Returns true if and only if there is a path from the start vertex to the
+     * end vertex. Returns false if either vertex is not in the graph.
+     * Complexity: O(V + E)
+     */
+    template <class V1>
+    friend bool is_reachable(const base_graph<V1>& g, size_t start_vertex, size_t end_vertex);
 
   protected:
 
@@ -602,6 +612,15 @@ namespace graphfruit {
     }
     color[u] = 2;
     return false;
+  }
+
+  template <class V>
+  bool is_reachable(const base_graph<V>& g, size_t start_vertex, size_t end_vertex) {
+    if (!g.contains_vertex(end_vertex)) {
+      return false;
+    }
+    std::vector<bool> reachable = breadth_first_search(g, start_vertex);
+    return reachable[end_vertex];
   }
 
 }

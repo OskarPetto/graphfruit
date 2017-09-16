@@ -1,7 +1,9 @@
 /*
  * A class for directed graphs.
+ * @version 16.09.2017
+ *  transpose added
  * @version 15.09.2017
-    changed formating of operator <<
+ *  changed formating of operator <<
  * @version 14.09.2017
  *  Johnson's algorithm added
  * @version 13.09.2017
@@ -144,6 +146,14 @@ namespace graphfruit {
     template <class V1>
     friend std::vector<size_t> khan_topological_sort(const digraph<V1>& g);
 
+    /*
+     * Returns a directed graph with all of the edges reversed compared to the
+     * original directed graph.
+     * Complexity: O(V + E)
+     */
+    template <class V1>
+    friend digraph<V1> transpose(const digraph<V1>& g);
+
   };
 
   /*
@@ -169,7 +179,7 @@ namespace graphfruit {
       out << " ";
       out << "[" << g.vertex_list[i]->vertex_index;
       out << "]";
-      for (typename graph<V>::edge* e : g.vertex_list[i]->outgoing_edge_list) {
+      for (typename digraph<V>::edge* e : g.vertex_list[i]->outgoing_edge_list) {
         out << " - " << e->target_vertex->vertex_index;
       }
     }
@@ -395,6 +405,20 @@ namespace graphfruit {
       return empty;
     }
     return sorted_vertices;;
+  }
+
+  template <class V>
+  digraph<V> transpose(const digraph<V>& g) {
+    digraph<V> g1(g.number_of_vertices());
+    for (size_t u = 0; u < g.number_of_vertices(); u++) {
+      g1.vertex_list[u]->vertex_data = g.vertex_list[u]->vertex_data;
+    }
+    for (typename digraph<V>::edge* e : g.edge_list) {
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
+      g1.add_edge(v, u, e->edge_weight);
+    }
+    return g1;
   }
 
 }
