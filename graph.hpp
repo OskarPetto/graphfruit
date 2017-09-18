@@ -1,5 +1,7 @@
 /*
  * A class for undirected graphs.
+ * @version 18.09.2017
+ *  subgraph and subgraphs added, output of k-core changed to bool vector
  * @version 15.09.2017
  *  added k-core and changed formating of operator <<
  * @version 14.09.2017
@@ -95,12 +97,13 @@ namespace graphfruit {
     friend std::vector<std::vector<ssize_t> > johnson_all_shortest_paths(const graph<V1>& g);
 
     /*
-     * Returns the k-core of the graph. A k-core is a maximal subgraph in which
-     * all vertices have a degree of k or more.
+     * Calculates the k-core of the graph. A k-core is a maximal subgraph in
+     * which all vertices have a degree of k or more. Returns a bool vector
+     * indicating which vertices are in the k-core.
      * Complexity: O(V + E)
      */
     template <class V1>
-    friend graph<V1> k_core(const graph<V1>& g, size_t k);
+    friend std::vector<bool> k_core(const graph<V1>& g, size_t k);
 
     /*
      * Uses Kruskal's algorithm to find the edges of a minimum spanning tree of
@@ -119,6 +122,26 @@ namespace graphfruit {
      */
     template <class V1>
     friend std::vector<std::pair<size_t, size_t> > prim_minimum_spanning_tree(const graph<V1>& g);
+
+    /*
+     * Returns a subgraph from an input undirected graph and a bool vector
+     * indicating which vertices are in the subgraph. If the length of the
+     * vector doesn't equal the number of vertices in the graph, an
+     * invalid_argument exception is thrown.
+     * Complexity: O(V + E)
+     */
+    template <class V1>
+    friend graph<V1> subgraph(const graph<V1>& g, std::vector<bool> contains);
+
+    /*
+     * Returns a vector of subgraphs from an input undirected graph and a
+     * size_t vector indicating which vertices belong in which subgraph. If the
+     * length of the vector doesn't equal the number of vertices in the graph,
+     * an invalid_argument exception is thrown.
+     * Complexity: O(V + E)
+     */
+    template <class V1>
+    friend std::vector<graph<V1> > subgraphs(const graph<V1>& g, std::vector<size_t> components);
 
   protected:
 
@@ -277,7 +300,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  graph<V> k_core(const graph<V>& g, size_t k) {
+  std::vector<bool> k_core(const graph<V>& g, size_t k) {
     std::vector<bool> visited(g.number_of_vertices());
     std::vector<size_t> degree(g.number_of_vertices());
 
@@ -297,24 +320,14 @@ namespace graphfruit {
         g.DFS_degree(visited, i, degree, k);
       }
     }
-    std::vector<ssize_t> pos(g.number_of_vertices(), -1);
-    size_t i = 0;
-    graph<V> g1;
     for (size_t u = 0; u < g.number_of_vertices(); u++) {
       if (degree[u] >= k) {
-        g1.add_vertex(g.vertex_list[u]->vertex_data);
-        pos[u] = i;
-        i++;
+        visited[u] = true;
+      } else {
+        visited[u] = false;
       }
     }
-    for (typename graph<V>::edge* e : g.edge_list) {
-      size_t u = e->source_vertex->vertex_index;
-      size_t v = e->target_vertex->vertex_index;
-      if (degree[u] >= k && degree[v] >= k && u > v) {
-        g1.add_edge(pos[u], pos[v], e->edge_weight);
-      }
-    }
-    return g1;
+    return visited;
   }
 
   template <class V>
@@ -389,6 +402,60 @@ namespace graphfruit {
       }
     }
     return result;
+  }
+
+  template <class V>
+  graph<V> subgraph(const graph<V>& g, std::vector<bool> contains) {
+    if (g.number_of_vertices() != contains.size()) {
+      throw std::invalid_argument("subgraph::vector size differs from number of vertices");
+    }
+    graph<V> g1;
+    std::vector<size_t> pos(g.number_of_vertices());
+    size_t i = 0;
+    for (size_t u = 0; u < g.number_of_vertices(); u++) {
+      if (contains[u]) {
+        g1.add_vertex(g.vertex_list[u]->vertex_data);
+        pos[u] = i;
+        i++;
+      }
+    }
+    for (typename graph<V>::edge* e : g.edge_list) {
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
+      if (contains[u] && contains[v] && u <= v) {
+        g1.add_edge(pos[u], pos[v], e->edge_weight);
+      }
+    }
+    return g1;
+  }
+
+  template <class V>
+  std::vector<graph<V> > subgraphs(const graph<V>& g, std::vector<size_t> component) {
+    if (g.number_of_vertices() != component.size()) {
+      throw std::invalid_argument("subgraph::vector size differs from number of vertices");
+    }
+    size_t max_component = 0;
+    for (size_t i = 0; i < g.number_of_vertices(); i++) {
+      if (component[i] > max_component) {
+        max_component = component[i];
+      }
+    }
+    std::vector<graph<V> > g1(max_component + 1);
+    std::vector<size_t> index(max_component + 1);
+    std::vector<size_t> pos(g.number_of_vertices());
+    for (size_t u = 0; u < g.number_of_vertices(); u++) {
+      g1[component[u]].add_vertex(g.vertex_list[u]->vertex_data);
+      pos[u] = index[component[u]];
+      index[component[u]]++;
+    }
+    for (typename graph<V>::edge* e : g.edge_list) {
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
+      if (component[u] == component[v] && u <= v) {
+        g1[component[u]].add_edge(pos[u], pos[v], e->edge_weight);
+      }
+    }
+    return g1;
   }
 
 }

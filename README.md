@@ -20,6 +20,7 @@
 * Kruskal's minimum spanning tree
 * Longest path in DAGs
 * Prim's minimum spanning tree
+* Split graph into subgraphs
 * Transpose of directed graph
 
 Output of *tester.cpp*:
@@ -32,6 +33,19 @@ Output of *tester.cpp*:
 2
 1
 7
+-------Split into multiple subgraphs-------
+Graph: V=3, E=2
+[0] - 1
+[1] - 0 - 2
+[2] - 1
+Graph: V=3, E=3
+[0] - 1 - 2
+[1] - 0 - 2
+[2] - 1 - 0
+Graph: V=3, E=3
+[0] - 1 - 2
+[1] - 0 - 2
+[2] - 1 - 0
 -------Breadth-first search-------
 0
 0

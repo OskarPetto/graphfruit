@@ -77,6 +77,23 @@ int main(int argc, char const *argv[]) {
   std::cout << d1.out_degree(4) << '\n';
   std::cout << d1.edge_weight(2, 3) << '\n';
 
+  std::cout << " -------Split into multiple subgraphs------- " << '\n';
+
+  std::vector<size_t> v(g1.number_of_vertices());
+  for (size_t i = 0; i < g1.number_of_vertices(); i++) {
+    if (i < g1.number_of_vertices() / 3) {
+      v[i] = 0;
+    } else if (i < 2 * g1.number_of_vertices() / 3) {
+      v[i] = 1;
+    } else {
+      v[i] = 2;
+    }
+  }
+  std::vector<graph<> > graphs = subgraphs(g1, v);
+  for (size_t i = 0; i < graphs.size(); i++) {
+    std::cout << graphs[i] << '\n';
+  }
+
   std::cout << " -------Breadth-first search------- " << '\n';
 
   std::vector<bool> visited = breadth_first_search(d1, 2);
@@ -152,7 +169,7 @@ int main(int argc, char const *argv[]) {
 
   std::cout << " -------k-cores------- " << '\n';
 
-  graph<> kc = k_core(g2, 3);
+  graph<> kc = subgraph(g2, k_core(g2, 3));
 
   std::cout << kc << '\n';
 

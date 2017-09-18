@@ -1,5 +1,7 @@
 /*
  * A class for directed graphs.
+ * @version 18.09.2017
+ *  subgraph and subgraphs added
  * @version 16.09.2017
  *  transpose added
  * @version 15.09.2017
@@ -145,6 +147,26 @@ namespace graphfruit {
      */
     template <class V1>
     friend std::vector<size_t> khan_topological_sort(const digraph<V1>& g);
+
+    /*
+     * Returns a subgraph from an input directed graph and a bool vector
+     * indicating which vertices are in the subgraph. If the length of the
+     * vector doesn't equal the number of vertices in the graph, an
+     * invalid_argument exception is thrown.
+     * Complexity: O(V + E)
+     */
+    template <class V1>
+    friend digraph<V1> subgraph(const digraph<V1>& g, std::vector<bool> contains);
+
+    /*
+     * Returns a vector of subgraphs from an input directed graph and a
+     * size_t vector indicating which vertices belong in which subgraph. If the
+     * length of the vector doesn't equal the number of vertices in the graph,
+     * an invalid_argument exception is thrown.
+     * Complexity: O(V + E)
+     */
+    template <class V1>
+    friend std::vector<digraph<V1> > subgraphs(const digraph<V1>& g, std::vector<size_t> components);
 
     /*
      * Returns a directed graph with all of the edges reversed compared to the
@@ -405,6 +427,60 @@ namespace graphfruit {
       return empty;
     }
     return sorted_vertices;;
+  }
+
+  template <class V>
+  digraph<V> subgraph(const digraph<V>& g, std::vector<bool> contains) {
+    if (g.number_of_vertices() != contains.size()) {
+      throw std::invalid_argument("subgraph::vector size differs from number of vertices");
+    }
+    digraph<V> g1;
+    std::vector<size_t> pos(g.number_of_vertices());
+    size_t i = 0;
+    for (size_t u = 0; u < g.number_of_vertices(); u++) {
+      if (contains[u]) {
+        g1.add_vertex(g.vertex_list[u]->vertex_data);
+        pos[u] = i;
+        i++;
+      }
+    }
+    for (typename graph<V>::edge* e : g.edge_list) {
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
+      if (contains[u] && contains[v]) {
+        g1.add_edge(pos[u], pos[v], e->edge_weight);
+      }
+    }
+    return g1;
+  }
+
+  template <class V>
+  std::vector<digraph<V> > subgraphs(const digraph<V>& g, std::vector<size_t> component) {
+    if (g.number_of_vertices() != component.size()) {
+      throw std::invalid_argument("subgraph::vector size differs from number of vertices");
+    }
+    size_t max_component = 0;
+    for (size_t i = 0; i < g.number_of_vertices(); i++) {
+      if (component[i] > max_component) {
+        max_component = component[i];
+      }
+    }
+    std::vector<digraph<V> > g1(max_component + 1);
+    std::vector<size_t> index(max_component + 1);
+    std::vector<size_t> pos(g.number_of_vertices());
+    for (size_t u = 0; u < g.number_of_vertices(); u++) {
+      g1[component[u]].add_vertex(g.vertex_list[u]->vertex_data);
+      pos[u] = index[component[u]];
+      index[component[u]]++;
+    }
+    for (typename graph<V>::edge* e : g.edge_list) {
+      size_t u = e->source_vertex->vertex_index;
+      size_t v = e->target_vertex->vertex_index;
+      if (component[u] == component[v]) {
+        g1[component[u]].add_edge(pos[u], pos[v], e->edge_weight);
+      }
+    }
+    return g1;
   }
 
   template <class V>
