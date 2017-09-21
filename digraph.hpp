@@ -1,5 +1,7 @@
 /*
  * A class for directed graphs.
+ * @version 21.09.2017
+ *  exchanged vector.resize with vector.reserve
  * @version 18.09.2017
  *  subgraph and subgraphs added
  * @version 16.09.2017
@@ -213,9 +215,9 @@ namespace graphfruit {
     if (!this->contains_vertex(source_vertex) || !this->contains_vertex(target_vertex)) {
       size_t max = source_vertex > target_vertex ? source_vertex + 1 : target_vertex + 1;
       size_t i = this->number_of_vertices();
-      this->vertex_list.resize(max);
+      this->vertex_list.reserve(max);
       for (;i < max; i++) {
-        this->vertex_list[i] = new vertex(i);
+        this->vertex_list.push_back(new vertex(i));
       }
     }
     edge* e = new edge(this->vertex_list[source_vertex], this->vertex_list[target_vertex], edge_weight);

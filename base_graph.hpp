@@ -1,5 +1,7 @@
 /*
  * An abstract class for undirected and directed graphs.
+ * @version 21.09.2017
+ *  exchanged vector.resize with vector.reserve
  * @version 16.09.2017
  *  added is_reachable
  * @version 14.09.2017
@@ -255,9 +257,9 @@ namespace graphfruit {
    */
   template <class V>
   base_graph<V>::base_graph(size_t n) {
-    vertex_list.resize(n);
+    vertex_list.reserve(n);
     for (size_t i = 0; i < n; i++) {
-      vertex_list[i] = new vertex(i);
+      vertex_list.push_back(new vertex(i));
     }
   }
 
@@ -348,17 +350,17 @@ namespace graphfruit {
   void base_graph<V>::deep_copy(const base_graph<V>& other) {
     size_t num_vertices = this->vertex_list.size();
     size_t num_edges = this->edge_list.size();
-    vertex_list.resize(num_vertices + other.number_of_vertices());
-    edge_list.resize(num_edges + other.edge_list.size());
+    vertex_list.reserve(num_vertices + other.number_of_vertices());
+    edge_list.reserve(num_edges + other.edge_list.size());
     for (size_t i = 0; i < other.number_of_vertices(); i++) {
       vertex* u = new vertex(num_vertices + i, other.vertex_list[i]->vertex_data);
-      vertex_list[num_vertices + i] = u;
+      vertex_list.push_back(u);
     }
     for (size_t i = 0; i < other.edge_list.size(); i++) {
       size_t u = other.edge_list[i]->source_vertex->vertex_index + num_vertices;
       size_t v = other.edge_list[i]->target_vertex->vertex_index + num_vertices;
       edge* e = new edge(vertex_list[u], vertex_list[v], other.edge_list[i]->edge_weight);
-      edge_list[num_edges + i] = e;
+      edge_list.push_back(e);
       vertex_list[u]->outgoing_edge_list.push_back(e);
     }
   }
