@@ -1,7 +1,7 @@
 /*
  * An abstract class for undirected and directed graphs.
  * @version 21.09.2017
- *  exchanged vector.resize with vector.reserve
+ *  changed vector.resize to vector.reserve
  * @version 16.09.2017
  *  added is_reachable
  * @version 14.09.2017

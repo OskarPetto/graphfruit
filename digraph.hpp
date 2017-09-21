@@ -1,7 +1,7 @@
 /*
  * A class for directed graphs.
  * @version 21.09.2017
- *  exchanged vector.resize with vector.reserve
+ *  changed vector.resize to vector.reserve
  * @version 18.09.2017
  *  subgraph and subgraphs added
  * @version 16.09.2017
