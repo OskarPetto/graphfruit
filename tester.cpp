@@ -186,9 +186,10 @@ int main(int argc, char const *argv[]) {
 
   std::cout << " -------Strongly connected components of directed graph------- " << '\n';
 
-  std::vector<size_t> components_d3 = strongly_connected_components(d3);
+  std::vector<digraph<>> components_d3 = subgraphs(d3, tarjan_strongly_connected_components(d3));
 
-  for (size_t i : components_d3) {
+
+  for (digraph<> i : components_d3) {
     std::cout << i << '\n';
   }
 

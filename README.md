@@ -19,5 +19,5 @@
 * Kruskal's minimum spanning tree
 * Longest path in DAGs
 * Prim's minimum spanning tree
-* Strongly Connected Components
+* Tarjan's strongly connected components
 * Transpose of directed graph

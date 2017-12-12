@@ -1,7 +1,7 @@
 /*
  * A class for directed graphs.
  * @version 12.12.2017
- *  added strongly_connected_components
+ *  added tarjan_strongly_connected_components
  * @version 21.09.2017
  *  changed vector.resize to vector.reserve
  * @version 18.09.2017
@@ -155,15 +155,6 @@ namespace graphfruit {
     friend std::vector<size_t> khan_topological_sort(const digraph<V1>& g);
 
     /*
-     * Uses Tarjan's algorithm to find strongly connected components of the
-     * graph. Returns a size_t vector indicating which vertices belong in which
-     * subgraph.
-     * Complexity: O(V + E)
-     */
-    template <class V1>
-    friend std::vector<size_t> strongly_connected_components(const digraph<V1>& g);
-
-    /*
      * Returns a subgraph from an input directed graph and a bool vector
      * indicating which vertices are in the subgraph. If the length of the
      * vector doesn't equal the number of vertices in the graph, an
@@ -183,6 +174,15 @@ namespace graphfruit {
     template <class V1>
     friend std::vector<digraph<V1> > subgraphs(const digraph<V1>& g, const std::vector<size_t>& components);
 
+   /*
+    * Uses Tarjan's algorithm to find strongly connected components of the
+    * graph. Returns a size_t vector indicating which vertices belong in which
+    * subgraph.
+    * Complexity: O(V + E)
+    */
+   template <class V1>
+   friend std::vector<size_t> tarjan_strongly_connected_components(const digraph<V1>& g);
+
     /*
      * Returns a directed graph with all of the edges reversed compared to the
      * original directed graph.
@@ -193,10 +193,10 @@ namespace graphfruit {
 
   protected:
 
-    void strongly_connected_components_util(size_t u, std::vector<ssize_t>& index, size_t &current_index,
-                                            std::vector<ssize_t>& smallest_reachable, std::stack<size_t>& st,
-                                            std::vector<bool>& is_on_stack, std::vector<size_t>& components,
-                                            size_t &current_component) const;
+    void tarjan_strongly_connected_components_util(size_t u, std::vector<ssize_t>& index, size_t &current_index,
+                                                    std::vector<ssize_t>& smallest_reachable, std::stack<size_t>& st,
+                                                    std::vector<bool>& is_on_stack, std::vector<size_t>& components,
+                                                    size_t &current_component) const;
 
 
   };
@@ -453,63 +453,6 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<size_t> strongly_connected_components(const digraph<V>& g) {
-    std::vector<ssize_t> index(g.number_of_vertices(), -1);
-    std::vector<ssize_t> smallest_reachable(g.number_of_vertices(), -1);
-    std::vector<bool> is_on_stack(g.number_of_vertices(), false);
-    std::stack<size_t> st;
-
-    std::vector<size_t> components(g.number_of_vertices());
-
-    size_t current_index = 0;
-    size_t current_component = 0;
-
-
-    for (size_t u = 0; u < g.number_of_vertices(); u++) {
-      if (index[u] == -1)
-      {
-        g.strongly_connected_components_util(u, index, current_index, smallest_reachable, st, is_on_stack, components, current_component);
-      }
-    }
-    return components;
-  }
-
-  template <class V>
-  void digraph<V>::strongly_connected_components_util(size_t u, std::vector<ssize_t>& index, size_t &current_index,
-                                                      std::vector<ssize_t>& smallest_reachable, std::stack<size_t>& st,
-                                                      std::vector<bool>& is_on_stack, std::vector<size_t>& components,
-                                                      size_t &current_component) const {
-    index[u] = current_index;
-    smallest_reachable[u] = current_index;
-    current_index++;
-    st.push(u);
-    is_on_stack[u] = true;
-
-    for (typename digraph<V>::edge* e : this->vertex_list[u]->outgoing_edge_list) {
-      size_t v = e->target_vertex->vertex_index;
-      if (index[v] == -1) {
-        strongly_connected_components_util(v, index, current_index, smallest_reachable, st, is_on_stack, components, current_component);
-        smallest_reachable[u] = std::min(smallest_reachable[u], smallest_reachable[v]);
-      } else if (is_on_stack[v]) {
-        smallest_reachable[u] = std::min(smallest_reachable[u], index[v]);
-      }
-    }
-
-    if (smallest_reachable[u] == index[u]) {
-      while (st.top() != u) {
-        size_t w = st.top();
-        components[w] = current_component;
-        is_on_stack[w] = false;
-        st.pop();
-      }
-      components[u] = current_component;
-      is_on_stack[u] = false;
-      st.pop();
-      current_component++;
-    }
-  }
-
-  template <class V>
   digraph<V> subgraph(const digraph<V>& g, const std::vector<bool>& contains) {
     if (g.number_of_vertices() != contains.size()) {
       throw std::invalid_argument("subgraph::vector size differs from number of vertices");
@@ -553,7 +496,7 @@ namespace graphfruit {
       pos[u] = index[components[u]];
       index[components[u]]++;
     }
-    for (typename graph<V>::edge* e : g.edge_list) {
+    for (typename digraph<V>::edge* e : g.edge_list) {
       size_t u = e->source_vertex->vertex_index;
       size_t v = e->target_vertex->vertex_index;
       if (components[u] == components[v]) {
@@ -561,6 +504,65 @@ namespace graphfruit {
       }
     }
     return g1;
+  }
+
+  template <class V>
+  std::vector<size_t> tarjan_strongly_connected_components(const digraph<V>& g) {
+    std::vector<ssize_t> index(g.number_of_vertices(), -1);
+    std::vector<ssize_t> smallest_reachable(g.number_of_vertices(), -1);
+    std::vector<bool> is_on_stack(g.number_of_vertices(), false);
+    std::stack<size_t> st;
+
+    std::vector<size_t> components(g.number_of_vertices());
+
+    size_t current_index = 0;
+    size_t current_component = 0;
+
+
+    for (size_t u = 0; u < g.number_of_vertices(); u++) {
+      if (index[u] == -1)
+      {
+        g.tarjan_strongly_connected_components_util(u, index, current_index,
+            smallest_reachable, st, is_on_stack, components, current_component);
+      }
+    }
+    return components;
+  }
+
+  template <class V>
+  void digraph<V>::tarjan_strongly_connected_components_util(size_t u, std::vector<ssize_t>& index, size_t &current_index,
+                                                             std::vector<ssize_t>& smallest_reachable, std::stack<size_t>& st,
+                                                             std::vector<bool>& is_on_stack, std::vector<size_t>& components,
+                                                             size_t &current_component) const {
+    index[u] = current_index;
+    smallest_reachable[u] = current_index;
+    current_index++;
+    st.push(u);
+    is_on_stack[u] = true;
+
+    for (typename digraph<V>::edge* e : this->vertex_list[u]->outgoing_edge_list) {
+      size_t v = e->target_vertex->vertex_index;
+      if (index[v] == -1) {
+        tarjan_strongly_connected_components_util(v, index, current_index,
+          smallest_reachable, st, is_on_stack, components, current_component);
+        smallest_reachable[u] = std::min(smallest_reachable[u], smallest_reachable[v]);
+      } else if (is_on_stack[v]) {
+        smallest_reachable[u] = std::min(smallest_reachable[u], index[v]);
+      }
+    }
+
+    if (smallest_reachable[u] == index[u]) {
+      while (st.top() != u) {
+        size_t w = st.top();
+        components[w] = current_component;
+        is_on_stack[w] = false;
+        st.pop();
+      }
+      components[u] = current_component;
+      is_on_stack[u] = false;
+      st.pop();
+      current_component++;
+    }
   }
 
   template <class V>
