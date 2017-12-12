@@ -66,12 +66,25 @@ int main(int argc, char const *argv[]) {
   d2.add_edge(3, 1, 1);
   d2.add_edge(4, 3, -3);
 
-  digraph<> d3(10);
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 5; j++) {
-      d3.add_edge(i,j);
-    }
-  }
+  digraph<> d3(11);
+  d3.add_edge(0,1);
+  d3.add_edge(0,3);
+  d3.add_edge(1,2);
+  d3.add_edge(1,4);
+  d3.add_edge(2,0);
+  d3.add_edge(2,6);
+  d3.add_edge(3,2);
+  d3.add_edge(4,5);
+  d3.add_edge(4,6);
+  d3.add_edge(5,6);
+  d3.add_edge(5,7);
+  d3.add_edge(5,8);
+  d3.add_edge(5,9);
+  d3.add_edge(6,4);
+  d3.add_edge(7,9);
+  d3.add_edge(8,9);
+  d3.add_edge(9,8);
+
 
   std::cout << " -------Graph------- " << '\n';
 
