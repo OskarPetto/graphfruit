@@ -133,7 +133,7 @@ namespace graphfruit {
      * Complexity: O(V + E)
      */
     template <class V1>
-    friend graph<V1> subgraph(const graph<V1>& g, std::vector<bool> contains);
+    friend graph<V1> subgraph(const graph<V1>& g, const std::vector<bool>& contains);
 
     /*
      * Returns a vector of subgraphs from an input undirected graph and a
@@ -143,7 +143,7 @@ namespace graphfruit {
      * Complexity: O(V + E)
      */
     template <class V1>
-    friend std::vector<graph<V1> > subgraphs(const graph<V1>& g, std::vector<size_t> components);
+    friend std::vector<graph<V1> > subgraphs(const graph<V1>& g, const std::vector<size_t>& components);
 
   protected:
 
@@ -352,7 +352,6 @@ namespace graphfruit {
 
   template <class V>
   std::vector<std::pair<size_t, size_t> > kruskal_minimum_spanning_tree(const graph<V>& g) {
-
     std::vector<std::pair<size_t, size_t> > result(g.number_of_vertices() - 1);
     std::vector<typename graph<V>::edge*> sorted_edges(g.number_of_edges());
     for (size_t i = 0; i < g.number_of_edges(); i++) {
@@ -407,7 +406,7 @@ namespace graphfruit {
   }
 
   template <class V>
-  graph<V> subgraph(const graph<V>& g, std::vector<bool> contains) {
+  graph<V> subgraph(const graph<V>& g, const std::vector<bool>& contains) {
     if (g.number_of_vertices() != contains.size()) {
       throw std::invalid_argument("subgraph::vector size differs from number of vertices");
     }
@@ -432,29 +431,29 @@ namespace graphfruit {
   }
 
   template <class V>
-  std::vector<graph<V> > subgraphs(const graph<V>& g, std::vector<size_t> component) {
-    if (g.number_of_vertices() != component.size()) {
-      throw std::invalid_argument("subgraph::vector size differs from number of vertices");
+  std::vector<graph<V> > subgraphs(const graph<V>& g, const std::vector<size_t>& components) {
+    if (g.number_of_vertices() != components.size()) {
+      throw std::invalid_argument("subgraphs::vector size differs from number of vertices");
     }
     size_t max_component = 0;
     for (size_t i = 0; i < g.number_of_vertices(); i++) {
-      if (component[i] > max_component) {
-        max_component = component[i];
+      if (components[i] > max_component) {
+        max_component = components[i];
       }
     }
     std::vector<graph<V> > g1(max_component + 1);
     std::vector<size_t> index(max_component + 1);
     std::vector<size_t> pos(g.number_of_vertices());
     for (size_t u = 0; u < g.number_of_vertices(); u++) {
-      g1[component[u]].add_vertex(g.vertex_list[u]->vertex_data);
-      pos[u] = index[component[u]];
-      index[component[u]]++;
+      g1[components[u]].add_vertex(g.vertex_list[u]->vertex_data);
+      pos[u] = index[components[u]];
+      index[components[u]]++;
     }
     for (typename graph<V>::edge* e : g.edge_list) {
       size_t u = e->source_vertex->vertex_index;
       size_t v = e->target_vertex->vertex_index;
-      if (component[u] == component[v] && u <= v) {
-        g1[component[u]].add_edge(pos[u], pos[v], e->edge_weight);
+      if (components[u] == components[v] && u <= v) {
+        g1[components[u]].add_edge(pos[u], pos[v], e->edge_weight);
       }
     }
     return g1;

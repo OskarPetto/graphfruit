@@ -66,6 +66,13 @@ int main(int argc, char const *argv[]) {
   d2.add_edge(3, 1, 1);
   d2.add_edge(4, 3, -3);
 
+  digraph<> d3(10);
+  for (int i = 0; i < 10; i++) {
+    for (int j = 0; j < 5; j++) {
+      d3.add_edge(i,j);
+    }
+  }
+
   std::cout << " -------Graph------- " << '\n';
 
   std::cout << g1.degree(4) << '\n';
@@ -176,6 +183,14 @@ int main(int argc, char const *argv[]) {
   std::cout << " -------Transpose of directed graph------- " << '\n';
 
   std::cout << transpose(d1) << '\n';
+
+  std::cout << " -------Strongly connected components of directed graph------- " << '\n';
+
+  std::vector<size_t> components_d3 = strongly_connected_components(d3);
+
+  for (size_t i : components_d3) {
+    std::cout << i << '\n';
+  }
 
   return 0;
 }
